@@ -22,7 +22,7 @@ export default function Login(){
            const result:LoginResult=await LoginApi(formData);
            if(result.success){
             localStorage.setItem('accessToken',result.accessToken)
-            console.log('accessToken',result.accessToken)
+            console.log('accessToken',result.accessToken) 
             setAccessToken(result.accessToken)
             router.push('/quizHome')
            }else{
@@ -61,6 +61,7 @@ export default function Login(){
         name="username"
         type="text"
         className="border rounded-md p-2 outline-none w-full"
+        required
       />
     </div>
 
@@ -70,6 +71,7 @@ export default function Login(){
         name="password"
         type="password"
         className="border rounded-md p-2 outline-none w-full"
+        required
       />
     </div>
 
