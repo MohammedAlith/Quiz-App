@@ -24,8 +24,9 @@ const cookie= await cookies();
     name:'accessToken',
     value:data.accessToken,
     
-     maxAge:60*5
- })
+     maxAge:10
+
+   })
 
  return {success:true, accessToken: data.accessToken}
 }

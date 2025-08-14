@@ -43,31 +43,45 @@ export default function Login(){
      await handleLogin(formData)
    }
     return(
-        <div className="  h-screen flex justify-center items-center ">
-            <form onSubmit={submit} className="bg-amber-300  rounded-md flex flex-col gap-5  p-10 ">
-            <div className="flex flex-col gap-1">
-                <label>Username</label>
-                 <input 
-                 name="username"
-                 type="text"
-                 className="border rounded-md p-1 outline-none"
-                 />
-            </div>
+        <div className=" flex flex-col justify-center items-center gap-5 
+                 p-5 ">
+  
+  <h1 className="text-3xl font-bold text-white">QUIZ APP</h1>
+  
+  <form 
+    onSubmit={submit} 
+    className="bg-white rounded-2xl flex flex-col gap-5 items-center 
+               p-6 sm:p-8 w-full max-w-xs sm:max-w-sm shadow-lg">
+    
+    <h1 className="text-2xl font-bold">LOGIN</h1>
+    
+    <div className="flex flex-col gap-1 w-full">
+      <label className="text-lg sm:text-xl">Username</label>
+      <input 
+        name="username"
+        type="text"
+        className="border rounded-md p-2 outline-none w-full"
+      />
+    </div>
 
-            <div className="flex flex-col gap-1">
-                <label>Password</label>
-                 <input
-                 name="password"
-                 type="password"
-                 className="border rounded-md p-1 outline-none" />
-            </div>
+    <div className="flex flex-col gap-1 w-full">
+      <label className="text-lg sm:text-xl">Password</label>
+      <input
+        name="password"
+        type="password"
+        className="border rounded-md p-2 outline-none w-full"
+      />
+    </div>
 
-               {error && <p className="text-red-500">{error}</p>}
-            <div className="self-center">
-                 <button className="rounded-md  bg-blue-500 px-5 py-2 text-center text-xl text-white font-bold">Login</button>
-            </div>
-            </form>
-        </div>
+    {error && <p className="text-red-500 text-md">{error}</p>}
+
+    <button 
+      className="rounded-md bg-blue-500 px-6 py-2 text-lg sm:text-xl text-white font-bold ">
+      Login
+    </button>
+  </form>
+</div>
+
     )
 
 }

@@ -17,7 +17,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       
-      <body className="bg-blue-100" >
+      <body className="min-h-dvh bg-linear-to-t from-sky-500 to-indigo-500" >
         <AuthProvider initialToken={accessToken}> 
           
         {children}
