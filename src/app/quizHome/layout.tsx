@@ -1,4 +1,5 @@
-import Navbar from "@/components/navbar"
+import Navbar from "@/components/navbar";
+
 
 export default async function RootLayout({
   children,
@@ -11,10 +12,11 @@ export default async function RootLayout({
     <html lang="en">
       
       <body suppressHydrationWarning={true}>
-
+      
       <Navbar/>
           
         {children}
+
     
         </body>
     </html>

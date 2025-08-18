@@ -1,7 +1,9 @@
-'use client'
+"use client";
 
 import { decode } from "html-entities";
-import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Answer, useScore } from "./context/scoreContext";
 
 export interface Quiz {
   category: string;
@@ -19,54 +21,96 @@ interface Props {
 export default function SingleQuiz({ singlequizzes }: Props) {
   const [page, setPage] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [isSubmitted, setIsSubmitted] = useState(false); // <-- changed
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [options, setOptions] = useState<string[]>([]);
+  const [timeLeft, setTimeLeft] = useState(10);
 
+  const { score, total, increaseScore, resetScore, saveAnswer } = useScore();
   const quiz = singlequizzes[page];
+  const router = useRouter();
 
+  // Reset score at start
+  useEffect(() => {
+    resetScore(singlequizzes.length);
+  }, [singlequizzes, resetScore]);
+
+  // Reset state on question change
   useEffect(() => {
     if (!quiz) return;
-    const newOptions = [
+    const shuffledOptions = [
       ...quiz.incorrect_answers.map((ans) => decode(ans)),
       decode(quiz.correct_answer),
     ].sort(() => Math.random() - 0.5);
-    setOptions(newOptions);
+
+    setOptions(shuffledOptions);
     setSelectedAnswer(null);
     setIsSubmitted(false);
+    setTimeLeft(10);
   }, [quiz]);
 
-  const handleSelect = (option: string) => {
-    if (isSubmitted) return; // cannot change after submit
-    setSelectedAnswer(option);
-  };
+  // Timer countdown
+  useEffect(() => {
+    if (isSubmitted || timeLeft <= 0) return;
+    const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
+    return () => clearInterval(timer);
+  }, [timeLeft, isSubmitted]);
 
   const isCorrect = (option: string) => option === decode(quiz.correct_answer);
 
   const handleSubmit = () => {
-    if (!selectedAnswer) return;
+    const correct = selectedAnswer ? isCorrect(selectedAnswer) : false;
+
+    const answer: Answer = {
+      question: decode(quiz.question),
+      selected: selectedAnswer,
+      correct: decode(quiz.correct_answer),
+      isCorrect: correct,
+      options,
+      timeTaken: 10 - timeLeft,
+    };
+
+    saveAnswer(answer);
+    if (correct) increaseScore();
     setIsSubmitted(true);
   };
 
   const goNext = () => {
-    if (page < singlequizzes.length - 1) {
-      setPage(page + 1);
-    }
-  };
+  if (!isSubmitted) handleSubmit(); 
+  if (page < singlequizzes.length - 1) {
+    setPage(page + 1);
+  } else {
+    router.push("/result"); 
+  }
+};
+
 
   return (
-    <div className="flex flex-col items-center h-screen ">
-      <div className="border p-4 mt-10 w-70 rounded-md bg-white flex flex-col gap-3 items-stretch">
-        <p className="font-semibold ">
+    <div className="flex flex-col items-center h-screen">
+      <div className="border p-4 mt-10 w-[500px] rounded-md bg-white flex flex-col gap-3 items-stretch shadow">
+        {/* Score and Timer */}
+        <div className="flex justify-between items-center">
+          <div className="font-semibold text-blue-600">
+            Score: {score}/{total}
+          </div>
+          <div className="text-red-500 font-bold">⏳ {timeLeft}s</div>
+        </div>
+
+        {/* Question */}
+        <p className="font-semibold">
           {page + 1}. {decode(quiz.question)}
         </p>
-        <div className="flex flex-col gap-2 ">
+
+        {/* Options */}
+        <div className="flex flex-col gap-2">
           {options.map((option, idx) => {
-            let optionStyle = "p-2 rounded cursor-pointer transition-colors w-fit";
-            
+            let optionStyle = "p-2 rounded cursor-pointer transition-colors";
+
             if (isSubmitted) {
               if (isCorrect(option)) optionStyle += " bg-green-300";
               else if (option === selectedAnswer) optionStyle += " bg-red-300";
             }
+
+            if (timeLeft === 0 && !isSubmitted) optionStyle += " bg-gray-300 cursor-not-allowed";
 
             return (
               <label key={idx} className={`${optionStyle} flex items-center gap-2`}>
@@ -75,8 +119,8 @@ export default function SingleQuiz({ singlequizzes }: Props) {
                   name={`question-${page}`}
                   value={option}
                   checked={selectedAnswer === option}
-                  onChange={() => handleSelect(option)}
-                  disabled={isSubmitted} // cannot change after submit
+                  onChange={() => setSelectedAnswer(option)}
+                  disabled={isSubmitted || timeLeft === 0}
                 />
                 {option}
               </label>
@@ -85,27 +129,17 @@ export default function SingleQuiz({ singlequizzes }: Props) {
         </div>
 
         {/* Buttons */}
-        {!isSubmitted ? (
+        {!isSubmitted && timeLeft > 0 ? (
           <button
             onClick={handleSubmit}
             className="px-4 py-2 bg-green-500 text-white rounded w-fit"
-            disabled={!selectedAnswer} // must select before submit
+            disabled={!selectedAnswer}
           >
             Submit
           </button>
-        ) : page < singlequizzes.length - 1 ? (
-          <button
-            onClick={goNext}
-            className="px-4 py-2 bg-blue-500 text-white rounded w-fit"
-          >
-            Next
-          </button>
         ) : (
-          <button
-            className="px-4 py-2 bg-gray-500 text-white rounded self-end"
-            disabled
-          >
-            Finished
+          <button onClick={goNext} className="px-4 py-2 bg-blue-500 text-white rounded w-fit">
+            {page < singlequizzes.length - 1 ? "Next" : "Finish"}
           </button>
         )}
       </div>

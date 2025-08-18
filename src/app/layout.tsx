@@ -1,5 +1,7 @@
 import { cookies } from "next/headers";
 import { AuthProvider } from "../components/context/AuthContext";
+import { ScoreProvider } from "../components/context/scoreContext";
+
 import './globals.css';
 export const metadata = {
   title: 'Next.js',
@@ -20,8 +22,9 @@ export default async function RootLayout({
       <body className="min-h-screen bg-linear-to-t from-sky-500 to-indigo-500" >
 
         <AuthProvider initialToken={accessToken}> 
-          
+         <ScoreProvider> 
         {children}
+        </ScoreProvider>
         </AuthProvider>
         </body>
     </html>
