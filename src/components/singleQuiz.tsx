@@ -32,7 +32,7 @@ export default function SingleQuiz({ singlequizzes }: Props) {
   // Reset score at start
   useEffect(() => {
     resetScore(singlequizzes.length);
-  }, [singlequizzes, resetScore]);
+  }, []);
 
   // Reset state on question change
   useEffect(() => {
@@ -74,14 +74,20 @@ export default function SingleQuiz({ singlequizzes }: Props) {
     setIsSubmitted(true);
   };
 
-  const goNext = () => {
-  if (!isSubmitted) handleSubmit(); 
+ const goNext = () => {
+  if (!isSubmitted) handleSubmit();
+  console.log("Navigating...", page, singlequizzes.length);
+
   if (page < singlequizzes.length - 1) {
     setPage(page + 1);
   } else {
-    router.push("/result"); 
+    setTimeout(() => {
+      console.log("Pushing to result page");
+      router.push("/result");
+    }, 0);
   }
 };
+
 
 
   return (
