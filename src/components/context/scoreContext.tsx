@@ -1,49 +1,73 @@
-"use client";
+'use client';
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export interface Answer {
   question: string;
-  selected: string | null;
-  correct: string;
-  isCorrect: boolean;
   options: string[];
+  correct: string;
+  selected: string;
   timeTaken: number;
 }
 
 interface ScoreContextType {
+  answers: Answer[];
+  addAnswer: (ans: Answer) => void;
   score: number;
   total: number;
-  answers: Answer[];
-  increaseScore: () => void;
-  resetScore: (total: number) => void;
-  saveAnswer: (ans: Answer) => void;
+  resetAnswers: (questionCount?: number) => void;
 }
 
 const ScoreContext = createContext<ScoreContextType | undefined>(undefined);
 
-export const ScoreProvider = ({ children }: { children: React.ReactNode }) => {
-  const [score, setScore] = useState(0);
-  const [total, setTotal] = useState(0);
+export function ScoreProvider({ children }: { children: ReactNode }) {
   const [answers, setAnswers] = useState<Answer[]>([]);
+  const [score, setScore] = useState(0);
+  const total=answers.length;
 
-  const increaseScore = () => setScore((s) => s + 1);
-  const resetScore = (t: number) => {
-    setScore(0);
-    setTotal(t);
-    setAnswers([]);
+  
+  useEffect(() => {
+    if (answers.length > 0) return; 
+    const saved = localStorage.getItem('quizAnswers');
+    if (saved) {
+      const parsed: Answer[] = JSON.parse(saved);
+      setAnswers(parsed);
+      setScore(parsed.filter(a => a.correct === a.selected).length);
+      
+    }
+  }, [answers.length]);
+
+  const addAnswer = (ans: Answer) => {
+    setAnswers(prev => {
+      const alreadyExists = prev.some(a => a.question === ans.question);
+      if (alreadyExists) return prev;
+
+      const updated = [...prev, ans];
+      setScore(updated.filter(a => a.correct === a.selected).length);
+
+      
+      localStorage.setItem('quizAnswers', JSON.stringify(updated));
+
+      return updated;
+    });
   };
-  const saveAnswer = (ans: Answer) => setAnswers((prev) => [...prev, ans]);
+
+  const resetAnswers = (questionCount = 0) => {
+    setAnswers([]);
+    setScore(0);
+    
+    localStorage.removeItem('quizAnswers');
+  };
 
   return (
-    <ScoreContext.Provider value={{ score, total, answers, increaseScore, resetScore, saveAnswer }}>
+    <ScoreContext.Provider value={{ answers, addAnswer, score, total, resetAnswers }}>
       {children}
     </ScoreContext.Provider>
   );
-};
+}
 
-export const useScore = () => {
-  const ctx = useContext(ScoreContext);
-  if (!ctx) throw new Error("useScore must be used inside ScoreProvider");
-  return ctx;
-};
+export function useScore() {
+  const context = useContext(ScoreContext);
+  if (!context) throw new Error('useScore must be used inside ScoreProvider');
+  return context;
+}

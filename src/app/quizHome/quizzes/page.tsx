@@ -9,8 +9,8 @@ export interface Quiz {
   incorrect_answers: string[];
 }
 export default async function QuizzesPage({ searchParams }:any) {
-  const category = searchParams?.category || "0";
-  const difficulty = searchParams?.difficulty || "any";
+  const category = await searchParams?.category || "0";
+  const difficulty = await searchParams?.difficulty || "any";
 
   const fetchUrl =
     category === "0" && difficulty === "any"

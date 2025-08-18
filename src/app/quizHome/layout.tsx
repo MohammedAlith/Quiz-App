@@ -1,7 +1,7 @@
 import Navbar from "@/components/navbar";
 
 
-export default async function RootLayout({
+export default async function QuizHomeLayout({
   children,
 }: {
   children: React.ReactNode
@@ -9,16 +9,9 @@ export default async function RootLayout({
 
  
   return (
-    <html lang="en">
-      
-      <body suppressHydrationWarning={true}>
-      
-      <Navbar/>
-          
-        {children}
-
-    
-        </body>
-    </html>
+  <>
+  <Navbar/>
+  {children}
+  </>
   )
 }
