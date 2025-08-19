@@ -19,6 +19,7 @@ export default function Login() {
       if (result.success) {
         
         localStorage.setItem("accessToken", result.accessToken);
+        console.log(result.accessToken,"accessToken");
         setAccessToken(result.accessToken);
 
       

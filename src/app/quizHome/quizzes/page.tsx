@@ -23,6 +23,7 @@ export default async function QuizzesPage({ searchParams }:any) {
 
   const res = await fetch(fetchUrl, { cache: "force-cache" });
   const data = await res.json();
+  console.log(data,"quizzes");
   const quizzes: Quiz[] = data.results || [];
 
   return <SingleQuiz singlequizzes={quizzes} />;

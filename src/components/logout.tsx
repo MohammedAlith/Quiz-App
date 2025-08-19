@@ -9,7 +9,8 @@ export default function LogoutButton() {
 
   const handleLogout = async () => {
     try {
-      
+       localStorage.removeItem('accessToken')
+      localStorage.removeItem('allQuizResults')
       resetAnswers();
 
       

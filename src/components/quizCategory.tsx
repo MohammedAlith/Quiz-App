@@ -21,6 +21,7 @@ export function QuizCategory() {
       const res = await fetch("https://opentdb.com/api_category.php");
       if (!res.ok) throw new Error("Failed to fetch categories");
       const data = await res.json();
+      console.log(data,"categories");
       setCategories(data.trivia_categories || []);
       setError(null);
     } catch (err) {

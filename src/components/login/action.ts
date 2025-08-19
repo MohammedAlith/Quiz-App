@@ -17,6 +17,7 @@ const response= await fetch('https://dummyjson.com/auth/login', {
 })
     
 const data=await response.json();
+console.log(data);
 
 if(data.accessToken){
 const cookie= await cookies();
