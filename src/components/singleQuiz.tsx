@@ -24,6 +24,7 @@ export default function SingleQuiz({ singlequizzes }: Props) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [options, setOptions] = useState<string[]>([]);
   const [timeLeft, setTimeLeft] = useState(10);
+  const [loadingOptions, setLoadingOptions] = useState(true);
 
   const { addAnswer, score,  resetAnswers } = useScore();
   const quiz = singlequizzes[page];
@@ -49,6 +50,7 @@ useEffect(() => {
   
   useEffect(() => {
     if (!quiz) return;
+     setLoadingOptions(false);
     const shuffled = [...quiz.incorrect_answers.map(ans => decode(ans)), decode(quiz.correct_answer)]
       .sort(() => Math.random() - 0.5);
     setOptions(shuffled);
@@ -69,11 +71,12 @@ useEffect(() => {
   const handleSubmit = () => {
   if (isSubmitted) return;
 
-  setIsSubmitted(true); // only mark question as submitted
+  setIsSubmitted(true); 
+  
 };
 
 const goNext = () => {
-  // always record the answer when moving next
+  
   const answerObj: Answer = {
     question: decode(quiz.question),
     options,
@@ -93,6 +96,7 @@ const goNext = () => {
 
 
   if (!quiz) return <p className="text-center mt-8">No quiz available</p>;
+ 
 
   return (
     <div className="flex flex-col justify-center items-center h-screen">
@@ -103,30 +107,36 @@ const goNext = () => {
         </div>
 
         <p className="font-semibold">{page + 1}. {decode(quiz.question)}</p>
+{loadingOptions ? (
+  <p className="text-center text-gray-500 py-4 text-lg">Loading options...</p>
+) :  ( !loadingOptions&&
+  <div className="flex flex-col gap-2">
+    {options.map((option, idx) => {
+      let style = 'p-2 rounded cursor-pointer';
+      if (isSubmitted) {
+        if (isCorrect(option)) style += ' bg-green-300';
+        else if (option === selectedAnswer) style += ' bg-red-300';
+      }
+      if (timeLeft === 0 && !isSubmitted) style += ' bg-gray-300 cursor-not-allowed';
+      return (
+        <label key={idx} className={`${style} flex items-center gap-2`}>
+          <input
+            type="radio"
+            name={`question-${page}`}
+            value={option}
+            checked={selectedAnswer === option}
+            onChange={() => setSelectedAnswer(option)}
+            disabled={isSubmitted || timeLeft === 0}
+          />
+          {option}
+        </label>
+      );
+    })}
+  </div>
+)}
 
-        <div className="flex flex-col gap-2">
-          {options.map((option, idx) => {
-            let style = 'p-2 rounded cursor-pointer';
-            if (isSubmitted) {
-              if (isCorrect(option)) style += ' bg-green-300';
-              else if (option === selectedAnswer) style += ' bg-red-300';
-            }
-            if (timeLeft === 0 && !isSubmitted) style += ' bg-gray-300 cursor-not-allowed';
-            return (
-              <label key={idx} className={`${style} flex items-center gap-2`}>
-                <input
-                  type="radio"
-                  name={`question-${page}`}
-                  value={option}
-                  checked={selectedAnswer === option}
-                  onChange={() => setSelectedAnswer(option)}
-                  disabled={isSubmitted || timeLeft === 0}
-                />
-                {option}
-              </label>
-            );
-          })}
-        </div>
+
+        
 
         {!isSubmitted && timeLeft > 0 ? (
           <button onClick={handleSubmit} className="px-4 py-2 bg-green-500 text-white rounded w-fit" disabled={!selectedAnswer}>Submit</button>

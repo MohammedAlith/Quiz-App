@@ -9,7 +9,7 @@ import { useScore } from "../context/scoreContext";
 export default function Login() {
   const router = useRouter();
   const { setAccessToken } = useAuth();
-  const { resetAnswers } = useScore(); // ✅ Reset score
+  const { resetAnswers } = useScore(); 
   const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (formData: FormData) => {
@@ -24,7 +24,7 @@ export default function Login() {
       
         resetAnswers(0); 
 
-        // Redirect to quiz home
+      
         router.push("/quizHome");
       } else {
         setError(result.error);

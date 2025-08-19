@@ -9,7 +9,7 @@ interface Props {
 export default function ResultShow({ answer }: Props) {
   const { answers: contextAnswers, score, total } = useScore();
   const answers = answer?.length ? answer : contextAnswers;
-// const displayScore = score > displayTotal ? displayTotal : score;
+
 
 
   let totalTime = 0;
