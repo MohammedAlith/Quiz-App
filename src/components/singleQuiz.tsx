@@ -42,10 +42,11 @@ useEffect(() => {
 
   
   useEffect(() => {
-    if(singlequizzes.length<0){
-    resetAnswers(singlequizzes.length)
-    };
-  }, [singlequizzes]);
+  if (singlequizzes.length < 0) {
+    resetAnswers();
+  }
+}, []);
+
 
   
   useEffect(() => {

@@ -22,7 +22,7 @@ export default function Login() {
         setAccessToken(result.accessToken);
 
       
-        resetAnswers(0); 
+        resetAnswers(); 
 
       
         router.push("/quizHome");

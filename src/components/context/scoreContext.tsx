@@ -15,7 +15,7 @@ interface ScoreContextType {
   addAnswer: (ans: Answer) => void;
   score: number;
   total: number;
-  resetAnswers: (questionCount?: number) => void;
+  resetAnswers: () => void;
 }
 
 const ScoreContext = createContext<ScoreContextType | undefined>(undefined);
@@ -23,19 +23,17 @@ const ScoreContext = createContext<ScoreContextType | undefined>(undefined);
 export function ScoreProvider({ children }: { children: ReactNode }) {
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [score, setScore] = useState(0);
-  const total=answers.length;
+  const total = answers.length;
 
-  
+  // Load saved answers on mount
   useEffect(() => {
-    if (answers.length > 0) return; 
     const saved = localStorage.getItem('quizAnswers');
     if (saved) {
       const parsed: Answer[] = JSON.parse(saved);
       setAnswers(parsed);
       setScore(parsed.filter(a => a.correct === a.selected).length);
-      
     }
-  }, [answers.length]);
+  }, []);
 
   const addAnswer = (ans: Answer) => {
     setAnswers(prev => {
@@ -44,19 +42,18 @@ export function ScoreProvider({ children }: { children: ReactNode }) {
 
       const updated = [...prev, ans];
       setScore(updated.filter(a => a.correct === a.selected).length);
-
-      
       localStorage.setItem('quizAnswers', JSON.stringify(updated));
 
       return updated;
     });
   };
 
-  const resetAnswers = (questionCount = 0) => {
+  const resetAnswers = () => {
     setAnswers([]);
     setScore(0);
-    
     localStorage.removeItem('quizAnswers');
+    localStorage.removeItem('quizPage');
+    localStorage.removeItem('quizzes');
   };
 
   return (
